@@ -1,0 +1,45 @@
+# URL de descarga y contrase�a del certificado
+$url = "https://github.com/KevsRomero/rpacert/raw/main/CertificadoOrche2022%20Meli2022.pfx"
+$password = "Meli2022"
+
+# Nombre del certificado a eliminar
+$certToDelete = "rpaorchestrator.pfx"
+
+# Ruta de descarga y archivo temporal
+$certPath = "C:\Temp\cert.pfx"
+
+Write-Host "Iniciando el proceso..."
+
+# Verificar si el certificado a eliminar existe
+$certStore = "Cert:\LocalMachine\Root"
+$certToDeleteObj = Get-ChildItem -Path $certStore | Where-Object { $_.FriendlyName -eq $certToDelete }
+
+if ($certToDeleteObj) {
+    Write-Host "Eliminando el certificado existente: $($certToDeleteObj.Subject)"
+    $certStoreObj = Get-Item -Path $certStore
+    $certStoreObj.Open("ReadWrite")
+    $certStoreObj.Remove($certToDeleteObj)
+    $certStoreObj.Close()
+} else {
+    Write-Host "El certificado $($certToDelete) no existe en el almac�n de certificados de confianza."
+}
+
+Write-Host "Descargando el nuevo certificado desde la URL: $($url)"
+# Descargar el certificado desde la URL
+Invoke-WebRequest -Uri $url -OutFile $certPath
+
+Write-Host "Instalando el nuevo certificado..."
+# Instalar el certificado en el almac�n de certificados de confianza local
+$cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2
+$cert.Import($certPath, $password, "Exportable,PersistKeySet")
+$certStoreObj = Get-Item -Path $certStore
+$certStoreObj.Open("ReadWrite")
+$certStoreObj.Add($cert)
+$certStoreObj.Close()
+
+# Eliminar el certificado descargado
+Remove-Item $certPath
+
+Write-Host "El certificado se ha instalado correctamente."
+
+Start-Sleep -Seconds 10
