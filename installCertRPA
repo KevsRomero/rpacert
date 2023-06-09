@@ -1,6 +1,6 @@
 # URL de descarga y contrase�a del certificado
-$url = "https://github.com/KevsRomero/rpacert/raw/main/CertificadoOrche2022%20Meli2022.pfx"
-$password = "Meli2022"
+$url = "https://github.com/KevsRomero/rpacert/raw/main/OrchestratorCertificate2024.pfx"
+$password = "Meli2024"
 
 # Nombre del certificado a eliminar
 $certToDelete = "rpaorchestrator.pfx"
